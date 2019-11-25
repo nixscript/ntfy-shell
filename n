@@ -1,0 +1,33 @@
+#!/bin/bash
+
+ICON="$HOME/svg-nixscript/li.svg"
+
+O=$(basename "$0")
+HELP="
+Usage: $O [options] command args\n
+Options:
+	-c	critical notify-send
+	-n	normal notify-send (default)
+	-i path/to/icon	picture (png,jpg,svg)
+	-e	end of options for '$O' (not required)
+	-h --help	this screen\n
+	You can change the icon by editing
+	ICON value in $0\n"
+if [ -z "$1" ]; then echo -e "$HELP"; exit; fi
+CMD="$*"
+A="normal"
+while [ -n "$1" ]
+do
+	case "$1" in
+		-c) A="critical"; CMD="${CMD//-c /}";;
+		-n) A="normal"; CMD="${CMD//-n /}";;
+		-i) ICON="$2"; CMD="${CMD//-i $2 /}";;
+		--help) echo -e "$HELP"; exit;;
+		-h) echo -e "$HELP"; exit;;
+		-e) CMD="${CMD//*-e /}"; break;;
+	esac
+	shift
+done
+
+if $CMD; then R="Ok!"; else R="ERROR!"; fi
+notify-send -u "$A" -i "$ICON" "Shell '${CMD// */}'" "Result: $R"
